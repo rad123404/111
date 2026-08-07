@@ -222,6 +222,10 @@ body {
   width: 100%; background: var(--bg); border: 1px solid var(--border);
   border-radius: 8px; color: var(--text); font-size: 13.5px; padding: 10px; font-family: inherit;
   min-height: 80px; resize: vertical; margin-bottom: 10px;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+  touch-action: auto !important;
 }
 .hw-detail textarea:focus { outline: none; border-color: var(--accent); }
 
@@ -336,7 +340,7 @@ body {
 
 /* ---------- modal ---------- */
 .overlay {
-  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px);
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(3px);
   display: none; align-items: flex-end; z-index: 50;
 }
 .overlay.open { display: flex; }
@@ -355,6 +359,10 @@ body {
 .sheet input, .sheet textarea {
   width: 100%; background: var(--card); border: 1px solid var(--border);
   border-radius: 8px; color: var(--text); font-size: 13.5px; padding: 10px; font-family: inherit; margin-bottom: 10px;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+  touch-action: auto !important;
 }
 .sheet textarea { min-height: 90px; resize: vertical; }
 .sheet input:focus, .sheet textarea:focus { outline: none; border-color: var(--accent); }
@@ -727,7 +735,7 @@ function formatCustomDate(dateObjOrString, formatType) {
   return `${dd}.${mm}.${yearNum}`;
 }
 
-/* ============ ЛОКАЛЬНЫЕ И КЛИЕНТСКИЕ НАСТРОЙКИ ============ */
+/* ============ ЛОКАЛЬНЫЕ И КЛИЕНТСКИЕ НАСТРОЙКИ (Только для текущего телефона) ============ */
 let userTgLang = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code === 'be') ? 'be' : 'ru';
 let lang = localStorage.getItem('app_lang') || userTgLang;
 
@@ -766,20 +774,20 @@ const DEFAULT_SCHEDULES = {
 };
 
 let SCHEDULES = DEFAULT_SCHEDULES;
-let hwStore = {
+let hwStore = JSON.parse(localStorage.getItem('custom_hw')) || {
   "math": [{ id: "1", text: "Стр. 42, №5-8, выучить правило", due: new Date(Date.now()+86400000).toISOString().slice(0,10), created: new Date().toISOString().slice(0,10) }]
 };
-let eventsStore = [
+let eventsStore = JSON.parse(localStorage.getItem('custom_events')) || [
   { id: '1', title: 'Классный час', date: new Date().toISOString().slice(0,10), time: '14:40' }
 ];
-let dutiesStore = "🧹 *График дежурств по классу*\n\n• Понедельник: Иванова Настя, Дятлов Влад\n• Вторник: Комар Влад, Щербич Вика\n• Среда: Самойлов Витя, Овсяник Стеша\n• Четверг: Дятлов Влад, Комар Влад\n• Пятница: Иванова Настя, Самойлов Витя";
-let birthdaysStore = [
+let dutiesStore = localStorage.getItem('custom_duties') || "🧹 *График дежурств по классу*\n\n• Понедельник: Иванова Настя, Дятлов Влад\n• Вторник: Комар Влад, Щербич Вика\n• Среда: Самойлов Витя, Овсяник Стеша\n• Четверг: Дятлов Влад, Комар Влад\n• Пятница: Иванова Настя, Самойлов Витя";
+let birthdaysStore = JSON.parse(localStorage.getItem('custom_birthdays')) || [
   { name: "Дятлов Влад", date: "12.01" },
   { name: "Комар Влад", date: "23.02" },
   { name: "Иванова Настя", date: "14.05" },
-  { name: "Щербич Вика", date: "08.08" },
+  { name: "Щербич Вика", date: "15.09" },
   { name: "Самойлов Витя", date: "11.11" },
-  { name: "Овсяник Стеша", date: "08.08" }
+  { name: "Овсяник Стеша", date: "20.10" }
 ];
 let isPollActive = false;
 let pollHistory = [];
@@ -790,8 +798,13 @@ let currentPoll = {
   eat:0, no:0, abs:0, voters:[]
 };
 
-/* ============ СИНХРОНИЗАЦИЯ С ОБЛАКОМ API ============ */
+/* ============ СИНХРОНИЗАЦИЯ С ОБЛАКОМ API (Единый сервер класса) ============ */
 async function syncGlobalData() {
+  localStorage.setItem('custom_hw', JSON.stringify(hwStore));
+  localStorage.setItem('custom_events', JSON.stringify(eventsStore));
+  localStorage.setItem('custom_duties', dutiesStore);
+  localStorage.setItem('custom_birthdays', JSON.stringify(birthdaysStore));
+
   const payload = {
     schedules: SCHEDULES,
     hw: hwStore,
@@ -821,10 +834,22 @@ async function fetchGlobalData() {
       const data = await res.json();
       if (data && typeof data === 'object') {
         if (data.schedules && Object.keys(data.schedules).length > 0) SCHEDULES = data.schedules;
-        if (data.hw && Object.keys(data.hw).length > 0) hwStore = data.hw;
-        if (data.events && Array.isArray(data.events) && data.events.length > 0) eventsStore = data.events;
-        if (data.duties && typeof data.duties === 'string' && data.duties.trim().length > 0) dutiesStore = data.duties;
-        if (data.birthdays && Array.isArray(data.birthdays) && data.birthdays.length > 0) birthdaysStore = data.birthdays;
+        if (data.hw && Object.keys(data.hw).length > 0) {
+          hwStore = data.hw;
+          localStorage.setItem('custom_hw', JSON.stringify(hwStore));
+        }
+        if (data.events && Array.isArray(data.events) && data.events.length > 0) {
+          eventsStore = data.events;
+          localStorage.setItem('custom_events', JSON.stringify(eventsStore));
+        }
+        if (data.duties && typeof data.duties === 'string' && data.duties.trim().length > 0) {
+          dutiesStore = data.duties;
+          localStorage.setItem('custom_duties', dutiesStore);
+        }
+        if (data.birthdays && Array.isArray(data.birthdays) && data.birthdays.length > 0) {
+          birthdaysStore = data.birthdays;
+          localStorage.setItem('custom_birthdays', JSON.stringify(birthdaysStore));
+        }
         if (data.poll_history) pollHistory = data.poll_history;
         if (data.current_poll) currentPoll = data.current_poll;
         if (data.poll_active !== undefined) isPollActive = data.poll_active;
@@ -1173,10 +1198,14 @@ function render(screen){
 /* ============ ДНИ РОЖДЕНИЯ НА ГЛАВНОМ ЭКРАНЕ ============ */
 function getTodayBirthdaysList() {
   const now = new Date();
-  const d = String(now.getDate()).padStart(2, '0');
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const todayStr = `${d}.${m}`;
-  return birthdaysStore.filter(b => b.date === todayStr);
+  const d = now.getDate();
+  const m = now.getMonth() + 1;
+  return birthdaysStore.filter(b => {
+    if (!b || !b.date) return false;
+    const parts = b.date.trim().split('.');
+    if (parts.length < 2) return false;
+    return parseInt(parts[0], 10) === d && parseInt(parts[1], 10) === m;
+  });
 }
 
 function updateHomeBdayBanner() {
@@ -1581,6 +1610,10 @@ function editHwItem(id) {
   if(item){
     document.getElementById('hwInput').value = item.text;
     document.getElementById('hwOverlay').classList.add('open');
+    setTimeout(() => {
+      const inp = document.getElementById('hwInput');
+      if (inp) inp.focus();
+    }, 150);
   }
 }
 
@@ -1855,6 +1888,11 @@ function openEventEditor(){
   document.getElementById('evDateInput').value = new Date().toISOString().slice(0,10);
   document.getElementById('evTimeInput').value = "12:00";
   document.getElementById('eventOverlay').classList.add('open');
+  
+  setTimeout(() => {
+    const inp = document.getElementById('evTitleInput');
+    if (inp) inp.focus();
+  }, 150);
 }
 function closeEventEditor(){ document.getElementById('eventOverlay').classList.remove('open'); }
 
@@ -1893,6 +1931,10 @@ function buildDutiesScreen(){
 function openDutiesEditorModal(){
   document.getElementById('dutiesInput').value = dutiesStore;
   document.getElementById('dutiesOverlay').classList.add('open');
+  setTimeout(() => {
+    const inp = document.getElementById('dutiesInput');
+    if (inp) inp.focus();
+  }, 150);
 }
 function closeDutiesEditor(){ document.getElementById('dutiesOverlay').classList.remove('open'); }
 function saveDutiesFromModal(){
@@ -1929,9 +1971,10 @@ function buildBirthdaysScreen(){
 
   const byMonth = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[],12:[]};
   birthdaysStore.forEach(b => {
-    const parts = b.date.split('.');
+    if (!b || !b.date) return;
+    const parts = b.date.trim().split('.');
     if(parts.length===2) {
-      const m = parseInt(parts[1]);
+      const m = parseInt(parts[1], 10);
       if(byMonth[m]) byMonth[m].push(b);
     }
   });
@@ -2025,6 +2068,7 @@ function handleBirthdaysUpload(e){
     try {
       birthdaysStore = JSON.parse(event.target.result);
       saveBirthdaysStore();
+      updateHomeBdayBanner();
       alert(lang==='be'?'Спіс дзён нараджэння абноўлены!':'Список дней рождения обновлен!');
       render(stack[stack.length-1]);
     } catch(err) { alert(lang==='be'?'Памылка чытання файла дзён нараджэння.':'Ошибка чтения файла дней рождения.'); }
@@ -2067,7 +2111,7 @@ function applyI18n(){
   render(stack[stack.length-1]);
 }
 
-/* ============ ЗАКРЫТИЕ МОДАЛОК ПО КЛИКУ НА ФОН ============ */
+/* ============ СОБЫТИЯ И СТАРТ ============ */
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
@@ -2077,10 +2121,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
+  // Загружаем данные из облака
   fetchGlobalData();
+  
+  // Авто-обновление каждые 10 секунд для синха между телефонами
+  setInterval(fetchGlobalData, 10000);
 });
 
-/* ============ СТАРТ ============ */
+// Авто-обновление при разворачивании приложения
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    fetchGlobalData();
+  }
+});
+
 if (tg && tg.themeParams && tg.themeParams.bg_color){
   document.documentElement.style.setProperty('--bg', tg.themeParams.bg_color);
 }
