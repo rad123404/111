@@ -40,7 +40,7 @@ body{
   overscroll-behavior-y:none;
   padding-bottom:env(safe-area-inset-bottom);
 }
-#app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+#app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;}
 
 /* ---------- top bar ---------- */
 .topbar{
@@ -662,7 +662,6 @@ body{
 const tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) {
   tg.ready();
-  tg.expand();
   if (tg.BackButton) {
     tg.BackButton.onClick(() => goBack());
   }
