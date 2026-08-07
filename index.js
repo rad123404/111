@@ -1,4 +1,4 @@
-// Начальное состояние памяти сервера
+// Память сервера
 let classSharedData = {
   schedules: {
     "math": {
@@ -35,9 +35,9 @@ let classSharedData = {
     { name: "Дятлов Влад", date: "12.01" },
     { name: "Комар Влад", date: "23.02" },
     { name: "Иванова Настя", date: "14.05" },
-    { name: "Щербич Вика", date: "08.08" },
+    { name: "Щербич Вика", date: "15.09" },
     { name: "Самойлов Витя", date: "11.11" },
-    { name: "Овсяник Стеша", date: "08.08" }
+    { name: "Овсяник Стеша", date: "20.10" }
   ],
   poll_active: false,
   poll_history: [],
@@ -58,7 +58,7 @@ export default {
         try {
           const body = await request.json();
           classSharedData = { ...classSharedData, ...body };
-          return new Response(JSON.stringify({ success: true }), {
+          return new Response(JSON.stringify({ success: true, data: classSharedData }), {
             headers: { 
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*' 
