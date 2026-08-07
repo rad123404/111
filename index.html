@@ -351,6 +351,7 @@ body {
   transform: translateY(100%); transition: transform .18s ease-out;
   position: relative;
 }
+.overlay.open .sheet { transform: translateY(0); }
 .sheet::before {
   content: ""; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
   width: 32px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2);
@@ -693,7 +694,14 @@ const tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) {
   tg.ready();
   if (tg.BackButton) {
-    tg.BackButton.onClick(() => goBack());
+    tg.BackButton.onClick(() => {
+      const openOverlay = document.querySelector('.overlay.open');
+      if (openOverlay) {
+        openOverlay.classList.remove('open');
+        return;
+      }
+      goBack();
+    });
   }
 }
 
@@ -777,17 +785,27 @@ let SCHEDULES = DEFAULT_SCHEDULES;
 let hwStore = JSON.parse(localStorage.getItem('custom_hw')) || {
   "math": [{ id: "1", text: "Стр. 42, №5-8, выучить правило", due: new Date(Date.now()+86400000).toISOString().slice(0,10), created: new Date().toISOString().slice(0,10) }]
 };
-let eventsStore = JSON.parse(localStorage.getItem('custom_events')) || [
-  { id: '1', title: 'Классный час', date: new Date().toISOString().slice(0,10), time: '14:40' }
-];
+let eventsStore = JSON.parse(localStorage.getItem('custom_events')) || [];
 let dutiesStore = localStorage.getItem('custom_duties') || "🧹 *График дежурств по классу*\n\n• Понедельник: Иванова Настя, Дятлов Влад\n• Вторник: Комар Влад, Щербич Вика\n• Среда: Самойлов Витя, Овсяник Стеша\n• Четверг: Дятлов Влад, Комар Влад\n• Пятница: Иванова Настя, Самойлов Витя";
 let birthdaysStore = JSON.parse(localStorage.getItem('custom_birthdays')) || [
-  { name: "Дятлов Влад", date: "12.01" },
+  { name: "Акрамова Сагдияна", date: "21.08" },
+  { name: "Дубовик Артем", date: "20.12" },
+  { name: "Дятлов Влад", date: "11.03" },
+  { name: "Еремеева Ксюша", date: "22.07" },
+  { name: "Зайцева Алина", date: "28.12" },
+  { name: "Иванова Настя", date: "15.01" },
+  { name: "Каверзникова Арина", date: "30.11" },
   { name: "Комар Влад", date: "23.02" },
-  { name: "Иванова Настя", date: "14.05" },
-  { name: "Щербич Вика", date: "15.09" },
-  { name: "Самойлов Витя", date: "11.11" },
-  { name: "Овсяник Стеша", date: "20.10" }
+  { name: "Овсяник Стеша", date: "08.06" },
+  { name: "Пациенок Дима", date: "06.04" },
+  { name: "Перевозникова Арина", date: "11.05" },
+  { name: "Рыбарт Вероника", date: "29.03" },
+  { name: "Самойлов Витя", date: "05.04" },
+  { name: "Цмыг Алёна", date: "07.01" },
+  { name: "Цмыг Яна", date: "07.01" },
+  { name: "Щербич Вика", date: "12.01" },
+  { name: "Щигельская Вика", date: "23.08" },
+  { name: "Дмитрий Александрович", date: "16.11" }
 ];
 let isPollActive = false;
 let pollHistory = [];
@@ -1680,7 +1698,9 @@ function createPollAction(){
   const today = new Date();
   const targetPollDateISO = getNextPollDate();
 
-  if (currentPoll && (currentPoll.voters.length > 0 || currentPoll.id)) {
+  // В архив переносим только реально существовавший опрос (isPollActive был true),
+  // а не пустышку-заглушку "poll_init", которая живёт в памяти до первого создания опроса.
+  if (isPollActive && currentPoll && currentPoll.id && currentPoll.id !== 'poll_init') {
     const existsIndex = pollHistory.findIndex(p => p.id === currentPoll.id);
     if (existsIndex >= 0) {
       pollHistory[existsIndex] = { ...currentPoll };
