@@ -17,20 +17,20 @@ import {
   INITIAL_BIRTHDAYS,
   INITIAL_DUTIES,
   INITIAL_HW
-} from './data/defaultData';
-import { initTelegramApp, haptic, tg, getTelegramUserName } from './utils/telegram';
-import { Topbar } from './components/Topbar';
-import { HomeView } from './components/HomeView';
-import { ScheduleView } from './components/ScheduleView';
-import { HomeworkView } from './components/HomeworkView';
-import { CanteenView } from './components/CanteenView';
-import { EventsView } from './components/EventsView';
-import { DutiesView } from './components/DutiesView';
-import { BirthdaysView } from './components/BirthdaysView';
-import { SettingsView } from './components/SettingsView';
-import { translate } from './utils/i18n';
+} from './defaultData';
+import { initTelegramApp, haptic, tg, getTelegramUserName } from './telegram';
+import { Topbar } from './Topbar';
+import { HomeView } from './HomeView';
+import { ScheduleView } from './ScheduleView';
+import { HomeworkView } from './HomeworkView';
+import { CanteenView } from './CanteenView';
+import { EventsView } from './EventsView';
+import { DutiesView } from './DutiesView';
+import { BirthdaysView } from './BirthdaysView';
+import { SettingsView } from './SettingsView';
+import { translate } from './i18n';
 import { Users, Calendar } from 'lucide-react';
-import { getNextSchoolDay } from './utils/dateFormatter';
+import { getNextSchoolDay } from './dateFormatter';
 
 export default function App() {
   // Telegram setup
