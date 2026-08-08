@@ -58,39 +58,18 @@ const DEFAULT_DATA = {
   }
 };
 
-let memoryFallback = null;
+let memoryStore = DEFAULT_DATA;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/data') {
-      let currentData = null;
-
-      if (env.CLASS_DATA_KV) {
-        try {
-          const raw = await env.CLASS_DATA_KV.get('shared_data');
-          if (raw) currentData = JSON.parse(raw);
-        } catch(e) {
-          console.error("KV Read Error:", e);
-        }
-      }
-
-      if (!currentData) {
-        currentData = memoryFallback || DEFAULT_DATA;
-      }
-
       if (request.method === 'POST') {
         try {
           const body = await request.json();
-          currentData = { ...currentData, ...body };
-
-          if (env.CLASS_DATA_KV) {
-            await env.CLASS_DATA_KV.put('shared_data', JSON.stringify(currentData));
-          }
-          memoryFallback = currentData;
-
-          return new Response(JSON.stringify({ success: true, data: currentData }), {
+          memoryStore = { ...memoryStore, ...body };
+          return new Response(JSON.stringify({ success: true, data: memoryStore }), {
             headers: { 
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*' 
@@ -100,7 +79,7 @@ export default {
           return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
         }
       } else {
-        return new Response(JSON.stringify(currentData), {
+        return new Response(JSON.stringify(memoryStore), {
           headers: { 
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*' 
