@@ -25,29 +25,41 @@ const DEFAULT_SCHEDULES = {
   }
 };
 
+const DEFAULT_BIRTHDAYS = [
+  {"name": "Акрамова Сагдияна", "date": "21.08"},
+  {"name": "Дубовик Артем", "date": "20.12"},
+  {"name": "Дятлов Влад", "date": "11.03"},
+  {"name": "Еремеева Ксюша", "date": "22.07"},
+  {"name": "Зайцева Алина", "date": "28.12"},
+  {"name": "Иванова Настя", "date": "15.01"},
+  {"name": "Каверзникова Арина", "date": "30.11"},
+  {"name": "Комар Влад", "date": "23.02"},
+  {"name": "Овсяник Стеша", "date": "08.06"},
+  {"name": "Пациенок Дима", "date": "06.04"},
+  {"name": "Перевозникова Арина", "date": "11.05"},
+  {"name": "Рыбарт Вероника", "date": "29.03"},
+  {"name": "Самойлов Витя", "date": "05.04"},
+  {"name": "Цмыг Алёна", "date": "07.01"},
+  {"name": "Цмыг Яна", "date": "07.01"},
+  {"name": "Щербич Вика", "date": "12.01"},
+  {"name": "Щигельская Вика", "date": "23.08"},
+  {"name": "Дмитрий Александрович", "date": "16.11"}
+];
+
 const DEFAULT_DATA = {
   schedules: DEFAULT_SCHEDULES,
-  hw: {
-    "math": [{ id: "1", text: "Стр. 42, №5-8, выучить правило", due: new Date(Date.now()+86400000).toISOString().slice(0,10), created: new Date().toISOString().slice(0,10) }]
-  },
+  hw: {},
   events: [
     { id: '1', title: 'Классный час', date: new Date().toISOString().slice(0,10), time: '14:40' }
   ],
   duties: {
-    "pn": ["Иванова Настя", "Дятлов Влад"],
-    "vt": ["Комар Влад", "Щербич Вика"],
-    "sr": ["Самойлов Витя", "Овсяник Стеша"],
-    "cht": ["Дятлов Влад", "Комар Влад"],
-    "pt": ["Иванова Настя", "Самойлов Витя"]
+    "pn": [],
+    "vt": [],
+    "sr": [],
+    "cht": [],
+    "pt": []
   },
-  birthdays: [
-    { name: "Дятлов Влад", date: "12.01" },
-    { name: "Комар Влад", date: "23.02" },
-    { name: "Иванова Настя", date: "14.05" },
-    { name: "Щербич Вика", date: "15.09" },
-    { name: "Самойлов Витя", date: "11.11" },
-    { name: "Овсяник Стеша", date: "20.10" }
-  ],
+  birthdays: DEFAULT_BIRTHDAYS,
   poll_active: false,
   poll_history: [],
   current_poll: {
