@@ -55,7 +55,7 @@ body {
   flex-direction: column;
 }
 
-/* ---------- top bar ---------- */
+/* Topbar */
 .topbar {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 10px;
@@ -78,12 +78,12 @@ body {
 .topbar h1 { font-size: 16px; font-weight: 600; margin: 0; flex: 1; color: var(--text); }
 .topbar .sub { font-size: 11px; color: var(--text-dim); }
 
-/* ---------- screens ---------- */
+/* Screens */
 .screen { display: none; padding: 10px 12px 20px; flex: 1; animation: rise .15s ease-out; }
 .screen.active { display: block; }
 @keyframes rise { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ---------- hero & live widget ---------- */
+/* Hero & Widget */
 .hero { display: flex; align-items: baseline; justify-content: space-between; padding: 4px 2px 10px; }
 .hero .greet { font-size: 17.5px; font-weight: 700; color: var(--text); }
 .hero .greet span { color: var(--accent); }
@@ -105,7 +105,7 @@ body {
 .lesson-widget .t1 { font-size: 13.5px; font-weight: 700; color: var(--accent); }
 .lesson-widget .t2 { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
 
-/* ---------- home grid ---------- */
+/* Grid */
 .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .menu-card {
   position: relative;
@@ -135,7 +135,7 @@ body {
 .c-class .ic { color: var(--class); background: rgba(229, 115, 115, 0.12); }
 .c-set .ic { color: var(--settings); background: rgba(144, 164, 174, 0.12); }
 
-/* ---------- search & inputs ---------- */
+/* Search & Inputs */
 .search-box {
   width: 100%; background: var(--card); border: 1px solid var(--border);
   border-radius: var(--radius-sm); color: var(--text); font-size: 13.5px;
@@ -144,7 +144,6 @@ body {
 }
 .search-box:focus { outline: none; border-color: var(--accent); }
 
-/* ---------- list rows ---------- */
 .section-label {
   font-size: 11px; font-weight: 700; color: var(--text-dim);
   text-transform: uppercase; letter-spacing: .05em;
@@ -168,7 +167,7 @@ body {
 .row .row-txt .t2 { font-size: 11.5px; color: var(--text-dim); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .row .chev { color: var(--text-faint); font-size: 13px; }
 
-/* ---------- segmented control ---------- */
+/* Segmented Control */
 .segmented {
   display: flex; background: var(--bg-elev); border: 1px solid var(--border);
   border-radius: 16px; padding: 2px; gap: 2px; margin-bottom: 12px;
@@ -182,7 +181,7 @@ body {
   background: var(--accent); color: #ffffff; font-weight: 700;
 }
 
-/* ---------- lesson list & duties ---------- */
+/* Lessons */
 .day-title { font-size: 14.5px; font-weight: 700; margin: 2px 2px 10px; color: var(--text); }
 .lesson {
   display: flex; align-items: flex-start; gap: 10px;
@@ -202,60 +201,30 @@ body {
 .lesson .time { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
 .empty { text-align: center; color: var(--text-dim); font-size: 13px; padding: 24px 10px; }
 
-/* ---------- ZONES & DUTIES CARDS ---------- */
+/* Zones & Duties */
 .zone-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px;
-  margin-bottom: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; margin-bottom: 10px;
 }
 .zone-card .zone-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
 }
-.zone-card .zone-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
-  display: flex; align-items: center; gap: 6px;
-}
+.zone-card .zone-title { font-size: 14px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 6px; }
 .zone-card .duty-student {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  margin-bottom: 6px;
-  font-size: 13px;
-  color: var(--text);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-elev); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 6px;
+  font-size: 13px; color: var(--text);
 }
-.preset-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 10px;
-}
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .preset-btn {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  padding: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;
 }
 .preset-btn:active { background: var(--card-hover); border-color: var(--accent); }
 
-/* ---------- HW & Cards ---------- */
+/* HW Cards */
 .subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .subj-card {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -309,7 +278,7 @@ body {
 .btn-row { display: flex; gap: 8px; margin-top: 8px; }
 .btn-row .btn { flex: 1; }
 
-/* ---------- canteen & actions ---------- */
+/* Actions */
 .big-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
 .big-action {
   display: flex; align-items: center; gap: 12px;
@@ -361,7 +330,7 @@ body {
 .st.no { background: rgba(229, 115, 115, 0.15); color: var(--danger); }
 .st.abs { background: rgba(144, 164, 174, 0.15); color: var(--settings); }
 
-/* ---------- birthdays & events ---------- */
+/* Birthdays & Events */
 .bday-banner {
   background: rgba(255, 213, 79, 0.08); border: 1px solid rgba(255, 213, 79, 0.2);
   border-radius: var(--radius); padding: 10px 12px; margin-bottom: 10px;
@@ -383,7 +352,7 @@ body {
   display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; flex: 0 0 auto;
 }
 
-/* ---------- settings ---------- */
+/* Settings */
 .lang-opt {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -395,7 +364,7 @@ body {
 .lang-opt.active .radio { border-color: var(--accent); }
 .lang-opt.active .radio::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--accent); }
 
-/* ---------- modal ---------- */
+/* Modals */
 .overlay {
   position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(3px);
   display: none; align-items: flex-end; z-index: 50;
@@ -625,7 +594,7 @@ body {
     </div>
   </div>
 
-  <!-- DUTIES SCREEN (ZONES & SEARCH) -->
+  <!-- DUTIES SCREEN -->
   <div class="screen" id="screen-duties">
     <input type="text" class="search-box" id="dutySearchInput" placeholder="🔍 Поиск дежурного по фамилии..." oninput="onDutySearchInput()">
     
@@ -739,7 +708,6 @@ body {
   </div>
 </div>
 
-<!-- МОДАЛКА СОЗДАНИЯ ЗОНЫ -->
 <div class="overlay" id="zoneAddOverlay">
   <div class="sheet">
     <h3 data-i18n="add_zone_title">Создать зону дежурства</h3>
@@ -758,7 +726,6 @@ body {
   </div>
 </div>
 
-<!-- МОДАЛКА НАЗНАЧЕНИЯ УЧЕНИКА В ЗОНУ -->
 <div class="overlay" id="dutyAddOverlay">
   <div class="sheet">
     <h3 data-i18n="add_duty_title">Назначить дежурного</h3>
@@ -822,7 +789,7 @@ function formatCustomDate(dateObjOrString, formatType) {
   return `${dd}.${mm}.${yearNum}`;
 }
 
-/* ============ ЛОКАЛЬНЫЕ НАСТРОЙКИ (ТОЛЬКО ЯЗЫК НА УСТРОЙСТВЕ) ============ */
+/* ============ ЕДИНСТВЕННАЯ КЛИЕНТСКАЯ НАСТРОЙКА — ЯЗЫК ============ */
 let userTgLang = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code === 'be') ? 'be' : 'ru';
 let lang = localStorage.getItem('app_lang') || userTgLang;
 
@@ -832,7 +799,7 @@ let state = {
   pollDetail: null, editingPast: false, hwTab: 'history', activeZoneId: null
 };
 
-/* ============ СЕРВЕРНЫЕ ГЛОБАЛЬНЫЕ ДАННЫЕ ============ */
+/* ============ ГЛОБАЛЬНЫЕ СЕРВЕРНЫЕ ДАННЫЕ ============ */
 let SCHEDULES = {};
 let hwStore = {};
 let eventsStore = [];
@@ -840,7 +807,7 @@ let dutiesStore = { "pn":[], "vt":[], "sr":[], "cht":[], "pt":[] };
 let birthdaysStore = [];
 let isPollActive = false;
 let pollHistory = [];
-let currentPoll = { id: "poll_init", created: "", date: "", eat:0, no:0, abs:0, voters:[] };
+let currentPoll = { id: null, created: "", date: "", eat:0, no:0, abs:0, voters:[] };
 
 /* ============ СИНХРОНИЗАЦИЯ С ОБЛАКОМ (Cloudflare API) ============ */
 async function syncGlobalData() {
@@ -1861,16 +1828,17 @@ function voteInPastPoll(v) {
   if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 }
 
-/* ============ МЕРОПРИЯТИЯ ============ */
+/* ============ МЕРОПРИЯТИЯ (СИНХРОНИЗИРУЕМЫЕ) ============ */
 function buildEventsScreen(){
   const box = document.getElementById('eventsList');
   box.innerHTML = "";
-  if(!eventsStore.length){
+  if(!eventsStore || !eventsStore.length){
     box.innerHTML = `<div class="empty">${t('no_events')}</div>`;
     return;
   }
-  eventsStore.sort((a,b)=> new Date(a.date) - new Date(b.date));
-  eventsStore.forEach(ev => {
+  
+  const sortedEvents = [...eventsStore].sort((a,b)=> new Date(a.date) - new Date(b.date));
+  sortedEvents.forEach(ev => {
     const dateStr = formatCustomDate(ev.date, 'day_month_long');
     const div = document.createElement('div');
     div.className = "event-card";
@@ -1891,6 +1859,7 @@ function openEventEditor(){
   document.getElementById('evTimeInput').value = "12:00";
   document.getElementById('eventOverlay').classList.add('open');
 }
+
 function closeEventEditor(){ document.getElementById('eventOverlay').classList.remove('open'); }
 
 function saveEvent(){
@@ -1899,9 +1868,11 @@ function saveEvent(){
   const time = document.getElementById('evTimeInput').value;
   
   if(!title || !date) {
-    alert("Заполните все поля!");
+    alert(lang==='be' ? "Запоўніце усе палі!" : "Заполните все поля!");
     return;
   }
+
+  if (!Array.isArray(eventsStore)) eventsStore = [];
 
   eventsStore.push({ id: Date.now().toString(), title, date, time });
   saveEventsStore();
@@ -1917,7 +1888,7 @@ function deleteEvent(id){
   if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 }
 
-/* ============ ДЕЖУРСТВА С ЗОНАМИ И ПОИСКОМ ============ */
+/* ============ ДЕЖУРСТВА ============ */
 function sanitizeDutiesData() {
   if (!dutiesStore || typeof dutiesStore !== 'object') {
     dutiesStore = { "pn":[], "vt":[], "sr":[], "cht":[], "pt":[] };
