@@ -58,7 +58,6 @@ const DEFAULT_DATA = {
   }
 };
 
-// Резервная память воркера, если KV еще не привязан локально
 let memoryFallback = null;
 
 export default {
@@ -68,7 +67,6 @@ export default {
     if (url.pathname === '/api/data') {
       let currentData = null;
 
-      // 1. Попытка прочитать из Cloudflare KV
       if (env.CLASS_DATA_KV) {
         try {
           const raw = await env.CLASS_DATA_KV.get('shared_data');
@@ -82,7 +80,6 @@ export default {
         currentData = memoryFallback || DEFAULT_DATA;
       }
 
-      // 2. Запись данных (POST)
       if (request.method === 'POST') {
         try {
           const body = await request.json();
@@ -102,10 +99,7 @@ export default {
         } catch(e) {
           return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
         }
-      } 
-      
-      // 3. Чтение данных (GET)
-      else {
+      } else {
         return new Response(JSON.stringify(currentData), {
           headers: { 
             'Content-Type': 'application/json',
