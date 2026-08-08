@@ -7,7 +7,6 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root {
-  /* Classic Universal Telegram Slate Dark Palette */
   --bg: #0e1621;
   --bg-elev: #17212b;
   --card: #18222d;
@@ -19,7 +18,6 @@
   --text-dim: #8e9fb1;
   --text-faint: #546575;
   
-  /* Telegram Classic Accent */
   --accent: #2aabee;
   --accent-soft: rgba(42, 171, 238, 0.14);
   
@@ -137,7 +135,16 @@ body {
 .c-class .ic { color: var(--class); background: rgba(229, 115, 115, 0.12); }
 .c-set .ic { color: var(--settings); background: rgba(144, 164, 174, 0.12); }
 
-/* ---------- generic list rows ---------- */
+/* ---------- search & inputs ---------- */
+.search-box {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 13.5px;
+  padding: 10px 12px; font-family: inherit; margin-bottom: 12px;
+  -webkit-user-select: text !important; user-select: text !important;
+}
+.search-box:focus { outline: none; border-color: var(--accent); }
+
+/* ---------- list rows ---------- */
 .section-label {
   font-size: 11px; font-weight: 700; color: var(--text-dim);
   text-transform: uppercase; letter-spacing: .05em;
@@ -175,7 +182,7 @@ body {
   background: var(--accent); color: #ffffff; font-weight: 700;
 }
 
-/* ---------- lesson list ---------- */
+/* ---------- lesson list & duties ---------- */
 .day-title { font-size: 14.5px; font-weight: 700; margin: 2px 2px 10px; color: var(--text); }
 .lesson {
   display: flex; align-items: flex-start; gap: 10px;
@@ -195,7 +202,7 @@ body {
 .lesson .time { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
 .empty { text-align: center; color: var(--text-dim); font-size: 13px; padding: 24px 10px; }
 
-/* ---------- HW subject grid ---------- */
+/* ---------- HW & Duties Grid/Cards ---------- */
 .subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .subj-card {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -222,10 +229,7 @@ body {
   width: 100%; background: var(--bg); border: 1px solid var(--border);
   border-radius: 8px; color: var(--text); font-size: 13.5px; padding: 10px; font-family: inherit;
   min-height: 80px; resize: vertical; margin-bottom: 10px;
-  -webkit-user-select: text !important;
-  user-select: text !important;
-  pointer-events: auto !important;
-  touch-action: auto !important;
+  -webkit-user-select: text !important; user-select: text !important;
 }
 .hw-detail textarea:focus { outline: none; border-color: var(--accent); }
 
@@ -349,24 +353,20 @@ body {
   border-radius: 18px 18px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
   border: 1px solid var(--border); border-bottom: none;
   transform: translateY(100%); transition: transform .18s ease-out;
-  position: relative;
+  position: relative; max-height: 85vh; overflow-y: auto;
 }
-.overlay.open .sheet { transform: translateY(0); }
 .sheet::before {
   content: ""; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
   width: 32px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2);
 }
 .sheet h3 { margin: 6px 0 12px; font-size: 15px; color: var(--text); font-weight: 700; }
-.sheet input, .sheet textarea {
+.sheet input, .sheet select, .sheet textarea {
   width: 100%; background: var(--card); border: 1px solid var(--border);
   border-radius: 8px; color: var(--text); font-size: 13.5px; padding: 10px; font-family: inherit; margin-bottom: 10px;
-  -webkit-user-select: text !important;
-  user-select: text !important;
-  pointer-events: auto !important;
-  touch-action: auto !important;
+  -webkit-user-select: text !important; user-select: text !important;
 }
 .sheet textarea { min-height: 90px; resize: vertical; }
-.sheet input:focus, .sheet textarea:focus { outline: none; border-color: var(--accent); }
+.sheet input:focus, .sheet select:focus, .sheet textarea:focus { outline: none; border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -408,7 +408,7 @@ body {
       </div>
       <div class="menu-card c-hw" onclick="nav('hw')">
         <div class="ic">📚</div>
-        <div><div class="lbl" data-i18n="menu_hw">Дамашняе заданне</div><div class="desc" data-i18n="menu_hw_d">Заданні па прадметах</div></div>
+        <div><div class="lbl" data-i18n="menu_hw">Домашнее задание</div><div class="desc" data-i18n="menu_hw_d">Задания по предметам</div></div>
       </div>
       <div class="menu-card c-events" onclick="nav('events')">
         <div class="ic">🗓</div>
@@ -448,7 +448,7 @@ body {
       </div>
     </div>
 
-    <div class="section-label" data-i18n="hw_by_days">Дамашнія заданні па днях тыдня</div>
+    <div class="section-label" data-i18n="hw_by_days">Домашние задания по дням</div>
     <div class="segmented" id="hwDaySeg"></div>
     <div id="hwDayLessonsList"></div>
   </div>
@@ -462,8 +462,8 @@ body {
   <!-- HW: DETAIL -->
   <div class="screen" id="screen-hw-detail">
     <div class="segmented" id="hwTabSeg">
-      <button id="tabHwHistoryBtn" class="active" onclick="switchHwTab('history')" data-i18n="hw_history">📜 Гісторыя заданняў</button>
-      <button id="tabHwCreateBtn" onclick="switchHwTab('create')" data-i18n="hw_create">➕ Стварыць заданне</button>
+      <button id="tabHwHistoryBtn" class="active" onclick="switchHwTab('history')" data-i18n="hw_history">📜 История заданий</button>
+      <button id="tabHwCreateBtn" onclick="switchHwTab('create')" data-i18n="hw_create">➕ Создать задание</button>
     </div>
 
     <div id="hwTabHistory">
@@ -473,8 +473,8 @@ body {
     <div id="hwTabCreate" style="display:none;">
       <div class="hw-detail">
         <div class="due" id="hwAutoDueLabel">📅 Авто-дата урока: --.--</div>
-        <textarea id="hwCreateInput" placeholder="Напрыклад: Стр. 42, №5-8, вывучыць правіла"></textarea>
-        <button class="btn btn-primary" onclick="saveNewHw()" data-i18n="save_hw_btn">Захаваць дамашняе заданне</button>
+        <textarea id="hwCreateInput" placeholder="Например: Стр. 42, №5-8, выучить правило"></textarea>
+        <button class="btn btn-primary" onclick="saveNewHw()" data-i18n="save_hw_btn">Сохранить задание</button>
       </div>
     </div>
   </div>
@@ -572,10 +572,20 @@ body {
     </div>
   </div>
 
-  <!-- DUTIES -->
+  <!-- DUTIES (NEW REDESIGN WITH SEARCH AND DAYS) -->
   <div class="screen" id="screen-duties">
-    <div class="hw-detail">
-      <div class="txt" id="dutiesText" style="white-space:pre-wrap;"></div>
+    <input type="text" class="search-box" id="dutySearchInput" placeholder="🔍 Поиск дежурного по фамилии..." oninput="onDutySearchInput()">
+    
+    <div id="dutyDaysView">
+      <div class="segmented" id="dutyDaySeg"></div>
+      <div class="day-title" id="dutyDayTitle"></div>
+      <div id="dutiesDayList" class="list" style="margin-bottom:12px;"></div>
+      <button class="btn btn-primary" onclick="openDutyAddModal()" data-i18n="add_duty_btn">➕ Добавить дежурного</button>
+    </div>
+
+    <div id="dutySearchResults" style="display:none;">
+      <div class="section-label" data-i18n="search_results">Результаты поиска</div>
+      <div id="dutySearchResultList" class="list"></div>
     </div>
   </div>
 
@@ -610,11 +620,11 @@ body {
 
       <div class="big-action" onclick="exportHW()">
         <div class="ic" style="background:rgba(76,175,80,.12);color:var(--hw);">📤</div>
-        <div class="txt"><div class="t1" data-i18n="export_hw">Экспорт дамашніх заданняў</div><div class="t2" data-i18n="export_hw_d">Сохранить файл заданий</div></div>
+        <div class="txt"><div class="t1" data-i18n="export_hw">Экспорт домашних заданий</div><div class="t2" data-i18n="export_hw_d">Сохранить файл заданий</div></div>
       </div>
       <div class="big-action" onclick="document.getElementById('hwFileInput').click()">
         <div class="ic" style="background:rgba(255,183,77,.12);color:var(--food);">📥</div>
-        <div class="txt"><div class="t1" data-i18n="import_hw">Импорт дамашніх заданняў</div><div class="t2" data-i18n="import_hw_d">Загрузить файл заданий</div></div>
+        <div class="txt"><div class="t1" data-i18n="import_hw">Импорт домашних заданий</div><div class="t2" data-i18n="import_hw_d">Загрузить файл заданий</div></div>
       </div>
 
       <div class="big-action" onclick="exportDuties()">
@@ -635,10 +645,6 @@ body {
         <div class="txt"><div class="t1" data-i18n="import_bdays">Импорт дней рождения</div><div class="t2" data-i18n="import_bdays_d">Загрузить список именинников</div></div>
       </div>
 
-      <div class="big-action" onclick="openDutiesEditorModal()">
-        <div class="ic" style="background:rgba(144,164,174,.12);color:var(--settings);">✏️</div>
-        <div class="txt"><div class="t1" data-i18n="edit_duties">Редактировать дежурства</div><div class="t2" data-i18n="edit_duties_d">Изменить текст вручную</div></div>
-      </div>
       <div class="big-action" onclick="clearAllHw()">
         <div class="ic" style="background:rgba(229,115,115,.12);color:var(--danger);">🧹</div>
         <div class="txt"><div class="t1" data-i18n="clear_hw_all" style="color:var(--danger);">Очистить все задания</div><div class="t2" data-i18n="clear_hw_all_d">Удалить все домашние задания</div></div>
@@ -647,7 +653,7 @@ body {
 
     <input type="file" id="fileInput" accept=".json" style="display:none;" onchange="handleScheduleUpload(event)">
     <input type="file" id="hwFileInput" accept=".json" style="display:none;" onchange="handleHwUpload(event)">
-    <input type="file" id="dutiesFileInput" accept=".json,.txt" style="display:none;" onchange="handleDutiesUpload(event)">
+    <input type="file" id="dutiesFileInput" accept=".json" style="display:none;" onchange="handleDutiesUpload(event)">
     <input type="file" id="bdayFileInput" accept=".json" style="display:none;" onchange="handleBirthdaysUpload(event)">
   </div>
 
@@ -678,13 +684,19 @@ body {
   </div>
 </div>
 
-<div class="overlay" id="dutiesOverlay">
+<!-- МОДАЛКА ДОБАВЛЕНИЯ ДЕЖУРНОГО -->
+<div class="overlay" id="dutyAddOverlay">
   <div class="sheet">
-    <h3 data-i18n="edit_duties">Редактировать дежурства</h3>
-    <textarea id="dutiesInput" style="min-height:160px;"></textarea>
+    <h3 data-i18n="add_duty_title">Назначить дежурного</h3>
+    <div class="section-label" data-i18n="choose_from_roster">Выбрать из списка класса</div>
+    <select id="dutyStudentSelect" onchange="onDutySelectChange(this)">
+      <option value="">-- Выберите ученика --</option>
+    </select>
+    <div class="section-label" data-i18n="or_manual_name">или введите вручную</div>
+    <input type="text" id="dutyManualNameInput" placeholder="Имя и Фамилия">
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="closeDutiesEditor()" data-i18n="cancel">Отмена</button>
-      <button class="btn btn-primary" onclick="saveDutiesFromModal()" data-i18n="save">Сохранить</button>
+      <button class="btn btn-ghost" onclick="closeDutyAddModal()" data-i18n="cancel">Отмена</button>
+      <button class="btn btn-primary" onclick="saveNewDuty()" data-i18n="save">Сохранить</button>
     </div>
   </div>
 </div>
@@ -694,25 +706,18 @@ const tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) {
   tg.ready();
   if (tg.BackButton) {
-    tg.BackButton.onClick(() => {
-      const openOverlay = document.querySelector('.overlay.open');
-      if (openOverlay) {
-        openOverlay.classList.remove('open');
-        return;
-      }
-      goBack();
-    });
+    tg.BackButton.onClick(() => goBack());
   }
 }
 
-/* ============ СОБСТВЕННЫЙ НАДЕЖНЫЙ ФОРМАТТЕР ДАТ ============ */
+/* ============ СОБСТВЕННЫЙ ФОРМАТТЕР ДАТ ============ */
 const MONTHS_RU_NOM = ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
 const MONTHS_RU_GEN = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 const WEEKDAYS_RU = ["воскресенье","понедельник","вторник","среда","четверг","пятница","суббота"];
 
 const MONTHS_BE_NOM = ["студзень","люты","сакавік","красавік","май","чэрвень","ліпень","жнівень","верасень","кастрычнік","лістапад","снежань"];
 const MONTHS_BE_GEN = ["студзеня","лютага","сакавіка","красавіка","мая","чэрвеня","ліпеня","жніўня","верасня","кастрычніка","лістапада","снежня"];
-const WEEKDAYS_BE = ["нядзеля","панядзелак","аўторак","верада","чацвер","пятніца","субота"];
+const WEEKDAYS_BE = ["нядзеля","панядзелак","аўторак","серада","чацвер","пятніца","субота"];
 
 function formatCustomDate(dateObjOrString, formatType) {
   const d = new Date(dateObjOrString);
@@ -743,86 +748,28 @@ function formatCustomDate(dateObjOrString, formatType) {
   return `${dd}.${mm}.${yearNum}`;
 }
 
-/* ============ ЛОКАЛЬНЫЕ И КЛИЕНТСКИЕ НАСТРОЙКИ (Только для текущего телефона) ============ */
+/* ============ ЛОКАЛЬНЫЕ НАСТРОЙКИ (ТОЛЬКО ЯЗЫК НА УСТРОЙСТВЕ) ============ */
 let userTgLang = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code === 'be') ? 'be' : 'ru';
 let lang = localStorage.getItem('app_lang') || userTgLang;
 
 let state = {
-  profile: localStorage.getItem('app_profile') || 'base',
-  day: null, hwDay: null, subject: 'math', pollDate: null,
+  profile: 'base',
+  day: null, hwDay: null, dutyDay: null, subject: 'math', pollDate: null,
   pollDetail: null, editingPast: false, hwTab: 'history'
 };
 
-/* ============ ОБЩИЕ ДАННЫЕ КЛАССА ПО УМОЛЧАНИЮ ============ */
-const DEFAULT_SCHEDULES = {
-  "math": {
-    "title": "Математика",
-    "pn": ["География", "Алгебра", "Геометрия", "Физкультура", "Русская литература", "Химия"],
-    "vt": ["История", "Физика", "Иностранный язык", "Информатика", "Белорусский язык", "Белорусская литература", "Классный час"],
-    "sr": ["Астрономия", "Биология", "Химия", "Иностранный язык", "Физика", "Алгебра", "Геометрия"],
-    "cht": ["1. Русский язык", "2. Алгебра", "3. История", "4. Физкультура", "5. Белорусский язык", "6. Русская литература", "7. Русский язык", "8. Инф. час"],
-    "pt": ["2. Физкультура", "3. Биология", "4. Обществоведение", "5. Доприз/Мед", "6. Русский язык", "7. Алгебра"]
-  },
-  "chem": {
-    "title": "Химия",
-    "pn": ["Алгебра", "География", "Химия", "Химия", "Физкультура", "Русская литература"],
-    "vt": ["Алгебра", "История", "Физика", "Иностранный язык", "Химия", "Белорусский язык", "Белорусская литература", "Классный час"],
-    "sr": ["Геометрия", "Астрономия", "Биология", "Информатика", "Иностранный язык", "Физика"],
-    "cht": ["Русский язык", "Химия", "История", "Физкультура", "Белорусский язык", "Русская литература", "Русский язык", "Инф. час"],
-    "pt": ["Геометрия", "Физкультура", "Биология", "Обществоведение", "Доприз/Мед", "Русский язык"]
-  },
-  "base": {
-    "title": "База",
-    "pn": ["Алгебра", "География", "Физкультура", "Русская литература", "Химия"],
-    "vt": ["Алгебра", "История", "Физика", "Иностранный язык", "Информатика", "Белорусский язык", "Белорусская литература", "Классный час"],
-    "sr": ["Геометрия", "Астрономия", "Биология", "Химия", "Иностранный язык", "Физика"],
-    "cht": ["Русский язык", "История", "Физкультура", "Белорусский язык", "Русская литература", "Инф. час"],
-    "pt": ["Геометрия", "Физкультура", "Биология", "Обществоведение", "Доприз/Мед"]
-  }
-};
-
-let SCHEDULES = DEFAULT_SCHEDULES;
-let hwStore = JSON.parse(localStorage.getItem('custom_hw')) || {
-  "math": [{ id: "1", text: "Стр. 42, №5-8, выучить правило", due: new Date(Date.now()+86400000).toISOString().slice(0,10), created: new Date().toISOString().slice(0,10) }]
-};
-let eventsStore = JSON.parse(localStorage.getItem('custom_events')) || [];
-let dutiesStore = localStorage.getItem('custom_duties') || "🧹 *График дежурств по классу*\n\n• Понедельник: Иванова Настя, Дятлов Влад\n• Вторник: Комар Влад, Щербич Вика\n• Среда: Самойлов Витя, Овсяник Стеша\n• Четверг: Дятлов Влад, Комар Влад\n• Пятница: Иванова Настя, Самойлов Витя";
-let birthdaysStore = JSON.parse(localStorage.getItem('custom_birthdays')) || [
-  { name: "Акрамова Сагдияна", date: "21.08" },
-  { name: "Дубовик Артем", date: "20.12" },
-  { name: "Дятлов Влад", date: "11.03" },
-  { name: "Еремеева Ксюша", date: "22.07" },
-  { name: "Зайцева Алина", date: "28.12" },
-  { name: "Иванова Настя", date: "15.01" },
-  { name: "Каверзникова Арина", date: "30.11" },
-  { name: "Комар Влад", date: "23.02" },
-  { name: "Овсяник Стеша", date: "08.06" },
-  { name: "Пациенок Дима", date: "06.04" },
-  { name: "Перевозникова Арина", date: "11.05" },
-  { name: "Рыбарт Вероника", date: "29.03" },
-  { name: "Самойлов Витя", date: "05.04" },
-  { name: "Цмыг Алёна", date: "07.01" },
-  { name: "Цмыг Яна", date: "07.01" },
-  { name: "Щербич Вика", date: "12.01" },
-  { name: "Щигельская Вика", date: "23.08" },
-  { name: "Дмитрий Александрович", date: "16.11" }
-];
+/* ============ СЕРВЕРНЫЕ ГЛОБАЛЬНЫЕ ДАННЫЕ ============ */
+let SCHEDULES = {};
+let hwStore = {};
+let eventsStore = [];
+let dutiesStore = { "pn":[], "vt":[], "sr":[], "cht":[], "pt":[] };
+let birthdaysStore = [];
 let isPollActive = false;
 let pollHistory = [];
-let currentPoll = {
-  id: "poll_init",
-  created: new Date().toISOString().slice(0,10),
-  date: new Date().toISOString().slice(0,10),
-  eat:0, no:0, abs:0, voters:[]
-};
+let currentPoll = { id: "poll_init", created: "", date: "", eat:0, no:0, abs:0, voters:[] };
 
-/* ============ СИНХРОНИЗАЦИЯ С ОБЛАКОМ API (Единый сервер класса) ============ */
+/* ============ СИНХРОНИЗАЦИЯ С ОБЛАКОМ (Cloudflare API) ============ */
 async function syncGlobalData() {
-  localStorage.setItem('custom_hw', JSON.stringify(hwStore));
-  localStorage.setItem('custom_events', JSON.stringify(eventsStore));
-  localStorage.setItem('custom_duties', dutiesStore);
-  localStorage.setItem('custom_birthdays', JSON.stringify(birthdaysStore));
-
   const payload = {
     schedules: SCHEDULES,
     hw: hwStore,
@@ -841,7 +788,7 @@ async function syncGlobalData() {
       body: JSON.stringify(payload)
     });
   } catch(e) {
-    console.warn("Ошибка подключения к серверу API:", e);
+    console.warn("Ошибка синхронизации с сервером:", e);
   }
 }
 
@@ -851,32 +798,33 @@ async function fetchGlobalData() {
     if (res.ok) {
       const data = await res.json();
       if (data && typeof data === 'object') {
-        if (data.schedules && Object.keys(data.schedules).length > 0) SCHEDULES = data.schedules;
-        if (data.hw && Object.keys(data.hw).length > 0) {
-          hwStore = data.hw;
-          localStorage.setItem('custom_hw', JSON.stringify(hwStore));
+        if (data.schedules) SCHEDULES = data.schedules;
+        if (data.hw) hwStore = data.hw;
+        if (data.events) eventsStore = data.events;
+        if (data.duties) {
+          // Обработка возможного старого текстового формата дежурств
+          if (typeof data.duties === 'string') {
+            dutiesStore = { "pn":["Иванова Настя", "Дятлов Влад"], "vt":["Комар Влад"], "sr":["Самойлов Витя"], "cht":["Дятлов Влад"], "pt":["Щербич Вика"] };
+          } else {
+            dutiesStore = data.duties;
+          }
         }
-        if (data.events && Array.isArray(data.events) && data.events.length > 0) {
-          eventsStore = data.events;
-          localStorage.setItem('custom_events', JSON.stringify(eventsStore));
-        }
-        if (data.duties && typeof data.duties === 'string' && data.duties.trim().length > 0) {
-          dutiesStore = data.duties;
-          localStorage.setItem('custom_duties', dutiesStore);
-        }
-        if (data.birthdays && Array.isArray(data.birthdays) && data.birthdays.length > 0) {
-          birthdaysStore = data.birthdays;
-          localStorage.setItem('custom_birthdays', JSON.stringify(birthdaysStore));
-        }
+        if (data.birthdays) birthdaysStore = data.birthdays;
         if (data.poll_history) pollHistory = data.poll_history;
         if (data.current_poll) currentPoll = data.current_poll;
         if (data.poll_active !== undefined) isPollActive = data.poll_active;
       }
     }
   } catch(e) {
-    console.warn("Загрузка из внешнего API недоступна, работаем в локальном режиме:", e);
+    console.warn("Загрузка из API недоступна:", e);
   }
-  render(stack[stack.length - 1]);
+  
+  // Обновляем текущий активный экран
+  const activeScreen = stack[stack.length - 1];
+  // Не перерисовываем, если пользователь вбивает данные в поиск или модалки
+  if (!document.querySelector('.overlay.open') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    render(activeScreen);
+  }
 }
 
 function saveHwStore() { syncGlobalData(); }
@@ -885,7 +833,7 @@ function saveDutiesStore() { syncGlobalData(); }
 function saveBirthdaysStore() { syncGlobalData(); }
 function savePollState() { syncGlobalData(); }
 
-/* ============ ПЕРЕВОДЫ И18N ============ */
+/* ============ ПЕРЕВОДЫ I18N ============ */
 const I18N = {
   ru: {
     hi: "Привет!",
@@ -949,11 +897,17 @@ const I18N = {
     export_bdays_d: "Сохранить список именинников",
     import_bdays: "Импорт дней рождения",
     import_bdays_d: "Загрузить список именинников",
-    edit_duties: "Редактировать дежурства",
-    edit_duties_d: "Изменить текст вручную",
     clear_hw_all: "Очистить все задания",
     clear_hw_all_d: "Удалить все домашние задания",
     hw_edit_title: "Текст домашнего задания",
+    add_duty_btn: "➕ Добавить дежурного",
+    add_duty_title: "Назначить дежурного",
+    choose_from_roster: "Выбрать из списка класса",
+    or_manual_name: "или введите вручную",
+    search_results: "Результаты поиска",
+    no_duties_day: "В этот день никто не дежурит",
+    no_duty_found: "Дежурств не найдено",
+    duty_on_days: "Дежурит в следующие дни:",
     cancel: "Отмена",
     t_schedule: "Расписание",
     t_hw: "Домашнее задание",
@@ -1044,11 +998,17 @@ const I18N = {
     export_bdays_d: "Захаваць спіс імяніннікаў",
     import_bdays: "Імпарт дзён нараджэння",
     import_bdays_d: "Загрузіць спіс імяніннікаў",
-    edit_duties: "Рэдагаваць чаргоўства",
-    edit_duties_d: "Змяніць тэкст уручную",
     clear_hw_all: "Ачысціць усе заданні",
     clear_hw_all_d: "Выдаліць усе дамашнія заданні",
     hw_edit_title: "Тэкст дамашняга задання",
+    add_duty_btn: "➕ Дадаць дзяжурнага",
+    add_duty_title: "Прызначыць дзяжурнага",
+    choose_from_roster: "Выбраць са спісу класа",
+    or_manual_name: "або ўвядзіце ўручную",
+    search_results: "Вынікі пошуку",
+    no_duties_day: "У гэты дзень ніхто не дзяжурыць",
+    no_duty_found: "Чаргоўстваў не знойдзена",
+    duty_on_days: "Дзяжурыць у наступныя дні:",
     cancel: "Адмена",
     t_schedule: "Расклад",
     t_hw: "Дамашняе заданне",
@@ -1147,7 +1107,7 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-/* ============ НАВИГАЦИЯ И ВЕРСТКА ============ */
+/* ============ НАВИГАЦИЯ ============ */
 let stack = ["home"];
 const TITLES = {
   home:()=> "Ierihon3",
@@ -1213,7 +1173,7 @@ function render(screen){
   if (screen==='settings') buildSettings();
 }
 
-/* ============ ДНИ РОЖДЕНИЯ НА ГЛАВНОМ ЭКРАНЕ ============ */
+/* ============ ДНИ РОЖДЕНИЯ НА ГЛАВНОМ ============ */
 function getTodayBirthdaysList() {
   const now = new Date();
   const d = now.getDate();
@@ -1244,7 +1204,7 @@ function updateHomeBdayBanner() {
   }
 }
 
-/* ============ ЖИВОЙ ВИДЖЕТ «ТЕКУЩИЙ УРОК / ПЕРЕМЕНА» ============ */
+/* ============ ЖИВОЙ ВИДЖЕТ УРОКОВ ============ */
 function updateLessonWidget() {
   const now = new Date();
   const dayOfWeek = now.getDay();
@@ -1262,7 +1222,7 @@ function updateLessonWidget() {
   const dayKeysMap = ['pn', 'vt', 'sr', 'cht', 'pt'];
   const dayKey = dayKeysMap[dayOfWeek - 1];
   const profile = state.profile || 'base';
-  const sched = (SCHEDULES[profile] || SCHEDULES['base'])[dayKey] || [];
+  const sched = (SCHEDULES[profile] || SCHEDULES['base'] || {})[dayKey] || [];
 
   if (!sched.length) {
     widgetIcon.textContent = "💤";
@@ -1272,7 +1232,6 @@ function updateLessonWidget() {
   }
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
   const timeTable = [
     { num: 1, start: 8*60,     end: 8*60 + 45 },
     { num: 2, start: 8*60+55,  end: 9*60 + 40 },
@@ -1320,12 +1279,7 @@ function updateLessonWidget() {
       }
     }
   }
-
-  widgetIcon.textContent = "🎉";
-  widgetTitle.textContent = lang==='be' ? "Урокі на сёння завершаны!" : "Уроки на сегодня завершены!";
-  widgetSub.textContent = "";
 }
-
 setInterval(updateLessonWidget, 10000);
 
 /* ============ РАСПИСАНИЕ ============ */
@@ -1337,7 +1291,6 @@ function buildProfileList(){
     row.className = "row";
     row.onclick = ()=>{ 
       state.profile=p; 
-      localStorage.setItem('app_profile', p);
       nav('schedule-days'); 
     };
     row.innerHTML = `<div class="row-ic">${(SCHEDULES[p]||{}).title ? '📐' : '📘'}</div>
@@ -1362,7 +1315,7 @@ function buildDaysScreen(){
   });
   document.getElementById('dayTitle').textContent = t('t_days')[state.day];
 
-  const rawList = (SCHEDULES[state.profile] || SCHEDULES['base'])[state.day] || [];
+  const rawList = (SCHEDULES[state.profile] || SCHEDULES['base'] || {})[state.day] || [];
   const box = document.getElementById('lessonsList');
   box.innerHTML = "";
   if(!rawList.length){
@@ -1403,24 +1356,11 @@ function getNextSchoolDay(startDateObj) {
 function getNextLessonDate(subjKey) {
   const today = new Date();
   today.setHours(0,0,0,0);
-
   let startDate = today;
-  const existingHws = getHwListForSubject(subjKey);
-  if (existingHws && existingHws.length > 0) {
-    existingHws.forEach(item => {
-      if (item.due) {
-        const itemDue = new Date(item.due);
-        itemDue.setHours(0,0,0,0);
-        if (!isNaN(itemDue.getTime()) && itemDue >= startDate) {
-          startDate = itemDue;
-        }
-      }
-    });
-  }
 
   const dayKeysMap = ['pn', 'vt', 'sr', 'cht', 'pt'];
   const profile = state.profile || 'base';
-  const sched = SCHEDULES[profile] || DEFAULT_SCHEDULES['base'];
+  const sched = SCHEDULES[profile] || SCHEDULES['base'] || {};
 
   for (let i = 1; i <= 21; i++) {
     const candidate = new Date(startDate);
@@ -1449,7 +1389,6 @@ function getNextLessonDate(subjKey) {
 function getNextPollDate() {
   const today = new Date();
   today.setHours(0,0,0,0);
-
   let lastDate = today;
 
   if (currentPoll && currentPoll.date) {
@@ -1460,31 +1399,15 @@ function getNextPollDate() {
     }
   }
 
-  if (pollHistory && pollHistory.length > 0) {
-    pollHistory.forEach(p => {
-      if (p.date) {
-        const pDate = new Date(p.date);
-        pDate.setHours(0,0,0,0);
-        if (!isNaN(pDate.getTime()) && pDate > lastDate) {
-          lastDate = pDate;
-        }
-      }
-    });
-  }
-
   const nextDate = getNextSchoolDay(lastDate);
   return nextDate.toISOString().slice(0, 10);
 }
 
-/* ============ ДАМАШНЯЕ ЗАДАННЕ ============ */
+/* ============ ДОМАШНЕЕ ЗАДАНИЕ ============ */
 function getHwListForSubject(subjKey) {
   if (!subjKey) subjKey = 'math';
-  if (!hwStore[subjKey]) {
-    hwStore[subjKey] = [];
-  }
-  if (!Array.isArray(hwStore[subjKey])) {
-    hwStore[subjKey] = [hwStore[subjKey]];
-  }
+  if (!hwStore[subjKey]) hwStore[subjKey] = [];
+  if (!Array.isArray(hwStore[subjKey])) hwStore[subjKey] = [hwStore[subjKey]];
   return hwStore[subjKey];
 }
 
@@ -1502,7 +1425,7 @@ function buildHwMainScreen(){
     seg.appendChild(b);
   });
 
-  const rawList = (SCHEDULES[state.profile] || SCHEDULES['base'])[state.hwDay] || [];
+  const rawList = (SCHEDULES[state.profile] || SCHEDULES['base'] || {})[state.hwDay] || [];
   const box = document.getElementById('hwDayLessonsList');
   box.innerHTML = "";
   if(!rawList.length){
@@ -1601,7 +1524,6 @@ function saveNewHw() {
   }
 
   if (!state.subject) state.subject = 'math';
-
   const due = getNextLessonDate(state.subject);
   const list = getHwListForSubject(state.subject);
 
@@ -1628,22 +1550,15 @@ function editHwItem(id) {
   if(item){
     document.getElementById('hwInput').value = item.text;
     document.getElementById('hwOverlay').classList.add('open');
-    setTimeout(() => {
-      const inp = document.getElementById('hwInput');
-      if (inp) inp.focus();
-    }, 150);
   }
 }
 
 function saveEditedHwItem() {
   const val = document.getElementById('hwInput').value.trim();
-  if (!val) {
-    alert(lang==='be' ? "Увядзіце тэкст задання!" : "Введите текст задания!");
-    return;
-  }
+  if (!val) return;
   const list = getHwListForSubject(state.subject);
   const item = list.find(x => x.id === activeEditHwId);
-  if(item && val){
+  if(item){
     item.text = val;
     saveHwStore();
   }
@@ -1667,7 +1582,7 @@ function clearAllHw(){
   if (confirm(t('confirm_clear_hw_all'))) {
     hwStore = {};
     saveHwStore();
-    alert(lang==='be' ? 'Усе дамашнія заданні паспяхова ачышчаны.' : 'Все домашние задания успешно очищены.');
+    alert(lang==='be' ? 'Усе дамашнія заданні ачышчаны.' : 'Все домашние задания очищены.');
     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
   }
 }
@@ -1698,9 +1613,7 @@ function createPollAction(){
   const today = new Date();
   const targetPollDateISO = getNextPollDate();
 
-  // В архив переносим только реально существовавший опрос (isPollActive был true),
-  // а не пустышку-заглушку "poll_init", которая живёт в памяти до первого создания опроса.
-  if (isPollActive && currentPoll && currentPoll.id && currentPoll.id !== 'poll_init') {
+  if (currentPoll && (currentPoll.voters.length > 0 || currentPoll.id)) {
     const existsIndex = pollHistory.findIndex(p => p.id === currentPoll.id);
     if (existsIndex >= 0) {
       pollHistory[existsIndex] = { ...currentPoll };
@@ -1713,9 +1626,7 @@ function createPollAction(){
     id: "poll_" + Date.now(),
     created: today.toISOString().slice(0, 10),
     date: targetPollDateISO,
-    eat: 0,
-    no: 0,
-    abs: 0,
+    eat: 0, no: 0, abs: 0,
     voters: []
   };
 
@@ -1908,11 +1819,6 @@ function openEventEditor(){
   document.getElementById('evDateInput').value = new Date().toISOString().slice(0,10);
   document.getElementById('evTimeInput').value = "12:00";
   document.getElementById('eventOverlay').classList.add('open');
-  
-  setTimeout(() => {
-    const inp = document.getElementById('evTitleInput');
-    if (inp) inp.focus();
-  }, 150);
 }
 function closeEventEditor(){ document.getElementById('eventOverlay').classList.remove('open'); }
 
@@ -1921,12 +1827,8 @@ function saveEvent(){
   const date = document.getElementById('evDateInput').value;
   const time = document.getElementById('evTimeInput').value;
   
-  if(!title) {
-    alert(lang==='be' ? "Калі ласка, увядзіце назву мерапрыемства!" : "Пожалуйста, введите название мероприятия!");
-    return;
-  }
-  if(!date) {
-    alert(lang==='be' ? "Калі ласка, выберыце дату!" : "Пожалуйста, выберите дату!");
+  if(!title || !date) {
+    alert("Заполните все поля!");
     return;
   }
 
@@ -1944,28 +1846,147 @@ function deleteEvent(id){
   if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 }
 
-/* ============ ДЕЖУРСТВА ============ */
+/* ============ ДЕЖУРСТВА (НОВЫЙ ИНТЕРФЕЙС И ПОИСК) ============ */
 function buildDutiesScreen(){
-  document.getElementById('dutiesText').textContent = dutiesStore;
+  const todayKey = DAY_KEYS[Math.min(new Date().getDay()===0?0:new Date().getDay()-1,4)];
+  if(!state.dutyDay) state.dutyDay = todayKey;
+
+  const seg = document.getElementById('dutyDaySeg');
+  seg.innerHTML = "";
+  DAY_KEYS.forEach(d=>{
+    const b = document.createElement('button');
+    b.textContent = t('t_days_s')[d];
+    b.className = d===state.dutyDay ? "active":"";
+    b.onclick = ()=>{ 
+      state.dutyDay=d; 
+      buildDutiesScreen(); 
+    };
+    seg.appendChild(b);
+  });
+
+  document.getElementById('dutyDayTitle').textContent = t('t_days')[state.dutyDay];
+
+  const currentList = dutiesStore[state.dutyDay] || [];
+  const listEl = document.getElementById('dutiesDayList');
+  listEl.innerHTML = "";
+
+  if(!currentList.length) {
+    listEl.innerHTML = `<div class="empty">${t('no_duties_day')}</div>`;
+  } else {
+    currentList.forEach((name, idx) => {
+      const row = document.createElement('div');
+      row.className = "row";
+      row.innerHTML = `
+        <div class="row-ic">🧹</div>
+        <div class="row-txt"><div class="t1">${escapeHtml(name)}</div></div>
+        <div class="del-btn" onclick="removeDuty('${state.dutyDay}', ${idx})">🗑️</div>
+      `;
+      listEl.appendChild(row);
+    });
+  }
 }
-function openDutiesEditorModal(){
-  document.getElementById('dutiesInput').value = dutiesStore;
-  document.getElementById('dutiesOverlay').classList.add('open');
-  setTimeout(() => {
-    const inp = document.getElementById('dutiesInput');
-    if (inp) inp.focus();
-  }, 150);
+
+function onDutySearchInput() {
+  const query = document.getElementById('dutySearchInput').value.trim().toLowerCase();
+  const daysView = document.getElementById('dutyDaysView');
+  const searchResults = document.getElementById('dutySearchResults');
+  const resultList = document.getElementById('dutySearchResultList');
+
+  if (!query) {
+    daysView.style.display = 'block';
+    searchResults.style.display = 'none';
+    return;
+  }
+
+  daysView.style.display = 'none';
+  searchResults.style.display = 'block';
+  resultList.innerHTML = "";
+
+  let foundCount = 0;
+
+  // Ищем совпадения по дням
+  DAY_KEYS.forEach(dayKey => {
+    const arr = dutiesStore[dayKey] || [];
+    const matches = arr.filter(name => name.toLowerCase().includes(query));
+
+    if (matches.length > 0) {
+      foundCount += matches.length;
+      matches.forEach(name => {
+        const row = document.createElement('div');
+        row.className = "row";
+        row.innerHTML = `
+          <div class="row-ic">🧹</div>
+          <div class="row-txt">
+            <div class="t1">${escapeHtml(name)}</div>
+            <div class="t2">${t('duty_on_days')} <b>${t('t_days')[dayKey]}</b></div>
+          </div>
+        `;
+        resultList.appendChild(row);
+      });
+    }
+  });
+
+  if (foundCount === 0) {
+    resultList.innerHTML = `<div class="empty">${t('no_duty_found')}</div>`;
+  }
 }
-function closeDutiesEditor(){ document.getElementById('dutiesOverlay').classList.remove('open'); }
-function saveDutiesFromModal(){
-  const val = document.getElementById('dutiesInput').value.trim();
-  if(val){
-    dutiesStore = val;
+
+function openDutyAddModal() {
+  const select = document.getElementById('dutyStudentSelect');
+  select.innerHTML = `<option value="">-- ${t('choose_from_roster')} --</option>`;
+
+  // Берем список учащихся из именинников
+  birthdaysStore.forEach(b => {
+    if (b && b.name) {
+      const opt = document.createElement('option');
+      opt.value = b.name;
+      opt.textContent = b.name;
+      select.appendChild(opt);
+    }
+  });
+
+  document.getElementById('dutyManualNameInput').value = "";
+  document.getElementById('dutyAddOverlay').classList.add('open');
+}
+
+function closeDutyAddModal() {
+  document.getElementById('dutyAddOverlay').classList.remove('open');
+}
+
+function onDutySelectChange(selectEl) {
+  if (selectEl.value) {
+    document.getElementById('dutyManualNameInput').value = selectEl.value;
+  }
+}
+
+function saveNewDuty() {
+  const nameInput = document.getElementById('dutyManualNameInput').value.trim();
+  if (!nameInput) {
+    alert("Введите имя ученика!");
+    return;
+  }
+
+  if (!dutiesStore[state.dutyDay]) {
+    dutiesStore[state.dutyDay] = [];
+  }
+
+  if (!dutiesStore[state.dutyDay].includes(nameInput)) {
+    dutiesStore[state.dutyDay].push(nameInput);
+    saveDutiesStore();
+  }
+
+  closeDutyAddModal();
+  buildDutiesScreen();
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
+
+function removeDuty(dayKey, index) {
+  if (dutiesStore[dayKey]) {
+    dutiesStore[dayKey].splice(index, 1);
     saveDutiesStore();
     buildDutiesScreen();
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
   }
-  closeDutiesEditor();
-  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 }
 
 /* ============ ДНИ РОЖДЕНИЯ ============ */
@@ -2034,7 +2055,7 @@ function downloadJSON(data, filename) {
 
 function exportSchedule() { downloadJSON(SCHEDULES, 'data_schedules.json'); }
 function exportHW() { downloadJSON(hwStore, 'data_homework.json'); }
-function exportDuties() { downloadJSON(dutiesStore, 'data_duties.txt'); }
+function exportDuties() { downloadJSON(dutiesStore, 'data_duties.json'); }
 function exportBirthdays() { downloadJSON(birthdaysStore, 'data_birthdays.json'); }
 
 function handleScheduleUpload(e){
@@ -2045,9 +2066,9 @@ function handleScheduleUpload(e){
     try {
       SCHEDULES = JSON.parse(event.target.result);
       syncGlobalData();
-      alert(lang==='be'?'Расклад паспяхова загружаны!':'Расписание успешно загружено!');
+      alert(lang==='be'?'Расклад загружаны!':'Расписание успешно загружено!');
       render(stack[stack.length-1]);
-    } catch(err) { alert(lang==='be'?'Памылка чытання файла раскладу.':'Ошибка чтения файла расписания.'); }
+    } catch(err) { alert(' Ошибка файла расписания.'); }
   };
   reader.readAsText(file);
 }
@@ -2060,9 +2081,9 @@ function handleHwUpload(e){
     try {
       hwStore = JSON.parse(event.target.result);
       saveHwStore();
-      alert(lang==='be'?'Дамашнія заданні адноўлены!':'Домашние задания восстановлены!');
+      alert('Домашние задания восстановлены!');
       render(stack[stack.length-1]);
-    } catch(err) { alert(lang==='be'?'Памылка чытання файла дамашніх заданняў.':'Ошибка чтения файла ДЗ.'); }
+    } catch(err) { alert('Ошибка файла ДЗ.'); }
   };
   reader.readAsText(file);
 }
@@ -2072,10 +2093,12 @@ function handleDutiesUpload(e){
   if(!file) return;
   const reader = new FileReader();
   reader.onload = function(event){
-    dutiesStore = event.target.result;
-    saveDutiesStore();
-    alert(lang==='be'?'Графік чаргоўства абноўлены!':'График дежурств обновлен!');
-    render(stack[stack.length-1]);
+    try {
+      dutiesStore = JSON.parse(event.target.result);
+      saveDutiesStore();
+      alert('График дежурств обновлен!');
+      render(stack[stack.length-1]);
+    } catch(err) { alert('Ошибка файла дежурств.'); }
   };
   reader.readAsText(file);
 }
@@ -2089,9 +2112,9 @@ function handleBirthdaysUpload(e){
       birthdaysStore = JSON.parse(event.target.result);
       saveBirthdaysStore();
       updateHomeBdayBanner();
-      alert(lang==='be'?'Спіс дзён нараджэння абноўлены!':'Список дней рождения обновлен!');
+      alert('Список дней рождения обновлен!');
       render(stack[stack.length-1]);
-    } catch(err) { alert(lang==='be'?'Памылка чытання файла дзён нараджэння.':'Ошибка чтения файла дней рождения.'); }
+    } catch(err) { alert('Ошибка файла дней рождения.'); }
   };
   reader.readAsText(file);
 }
@@ -2131,28 +2154,23 @@ function applyI18n(){
   render(stack[stack.length-1]);
 }
 
-/* ============ СОБЫТИЯ И СТАРТ ============ */
+/* ============ СТАРТ И АВТО-ОПРОС СЕРВЕРА ============ */
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        overlay.classList.remove('open');
-      }
+      if (e.target === overlay) overlay.classList.remove('open');
     });
   });
   
-  // Загружаем данные из облака
+  // Загружаем актуальные данные с сервера
   fetchGlobalData();
   
-  // Авто-обновление каждые 10 секунд для синха между телефонами
-  setInterval(fetchGlobalData, 10000);
+  // Авто-обновление каждые 3 секунды для мгновенной синхронизации между учениками
+  setInterval(fetchGlobalData, 3000);
 });
 
-// Авто-обновление при разворачивании приложения
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    fetchGlobalData();
-  }
+  if (document.visibilityState === 'visible') fetchGlobalData();
 });
 
 if (tg && tg.themeParams && tg.themeParams.bg_color){
